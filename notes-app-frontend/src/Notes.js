@@ -6,16 +6,22 @@ export default function Notes({ onLogout }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [editingNote, setEditingNote] = useState(null);
-  const [viewingNote, setViewingNote] = useState(null); // for reading
+  const [viewingNote, setViewingNote] = useState(null);
 
   const loadNotes = async () => {
-    const res = await API.get("/notes");
-    setNotes(res.data);
+    try {
+      const res = await API.get("/notes");
+      setNotes(res.data);
+    } catch (err) {
+      console.error("Failed to load notes:", err.response?.data || err.message);
+    }
   };
 
   const addNote = async () => {
-    if (!title.trim() || !content.trim())
-      return alert("Title and content are required.");
+    if (!title.trim() || !content.trim()) {
+      alert("Title and content are required.");
+      return;
+    }
     await API.post("/notes", { title, content });
     setTitle("");
     setContent("");
@@ -28,6 +34,7 @@ export default function Notes({ onLogout }) {
   };
 
   const startEditNote = (note) => setEditingNote(note);
+
   const saveEdit = async () => {
     if (!editingNote.title.trim() || !editingNote.content.trim()) return;
     await API.put(`/notes/${editingNote.id}`, {
@@ -39,7 +46,8 @@ export default function Notes({ onLogout }) {
   };
 
   useEffect(() => {
-    loadNotes();
+    const token = localStorage.getItem("token");
+    if (token) loadNotes();
   }, []);
 
   return (
@@ -148,7 +156,9 @@ export default function Notes({ onLogout }) {
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
             <h3>{viewingNote.title}</h3>
-            <p style={{ whiteSpace: "pre-wrap" }}>{viewingNote.content}</p>
+            <div style={styles.scrollableContent}>
+              <p style={{ whiteSpace: "pre-wrap" }}>{viewingNote.content}</p>
+            </div>
             <div style={{ textAlign: "right" }}>
               <button
                 style={styles.cancelButton}
@@ -267,9 +277,15 @@ const styles = {
     padding: "30px",
     borderRadius: "10px",
     width: "500px",
-    maxHeight: "80vh", // <-- fixed modal height
-    overflowY: "auto", // <-- enables scrolling
+    maxHeight: "80vh",
+    overflowY: "auto",
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+  },
+  scrollableContent: {
+    maxHeight: "50vh",
+    overflowY: "auto",
+    marginBottom: "20px",
+    whiteSpace: "pre-wrap",
   },
   modalFooter: {
     display: "flex",

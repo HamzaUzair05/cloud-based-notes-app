@@ -11,6 +11,7 @@ export default function Login({ onLogin }) {
       const res = await API.post("/login", { username, password });
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
+      console.log("Login successful:", res.data.token);
       setMessage({
         type: "success",
         text: "Login successful!",
