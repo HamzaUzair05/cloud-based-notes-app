@@ -164,11 +164,11 @@ project-root/
 
 ```
 project-vpc/
-├── Subnet 1 (Private)
+├── Subnet 1
 │   ├── EC2 Instance (Dockerized Flask Backend)
 │   └── RDS Instance (PostgreSQL)
 │
-└── Subnet 2 (Public)
+└── Subnet 2
     ├── Elastic Beanstalk EC2 Instance (React App)
     └── Connected S3 Bucket (static assets, optional)
 ```
