@@ -86,11 +86,15 @@ project-root/
 
 4. **Ensure port 5000 is open** in your EC2 security group
 
+---
+
 ### 🗄️ Database (PostgreSQL on AWS RDS)
 
 - DB Name: `jahanzeb_abdullah_db`
 - Endpoint: `jahanzeb-abdullah-db.chkocg22cbbj.eu-north-1.rds.amazonaws.com`
 - Ensure EC2 security group is allowed on port `5432`
+
+---
 
 ### 🌐 Frontend (React on Elastic Beanstalk)
 
@@ -151,6 +155,35 @@ project-root/
 | Beanstalk  | React app served on Node.js               |
 | CORS       | Enabled via `Flask-CORS`                  |
 | JWT Secret | Stored in Flask config (`JWT_SECRET_KEY`) |
+
+---
+
+## ☁️ Cloud Deployment Architecture
+
+### VPC: `project-vpc`
+
+```
+project-vpc/
+├── Subnet 1 (Private)
+│   ├── EC2 Instance (Dockerized Flask Backend)
+│   └── RDS Instance (PostgreSQL)
+│
+└── Subnet 2 (Public)
+    ├── Elastic Beanstalk EC2 Instance (React App)
+    └── Connected S3 Bucket (static assets, optional)
+```
+
+### Key AWS Resources:
+
+- **EC2**: Runs Flask backend in Docker container
+- **RDS**: PostgreSQL database
+- **Elastic Beanstalk**: Deploys production-ready React build
+- **S3 (optional)**: Used by EB or manually for static files
+- **IAM Roles**: For EC2 and EB access
+- **Security Groups**:
+  - Allow EB to access EC2 on port 5000
+  - Allow EC2 to access RDS on port 5432
+  - Allow internet access to EB
 
 ---
 
