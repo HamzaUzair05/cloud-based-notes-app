@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://16.171.57.187:5000/", // or your deployed backend URL
+  baseURL: "http://3.90.27.118:5000/", // Replace with your actual EC2 public IP
 });
 
 export const setToken = (token) => {

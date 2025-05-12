@@ -59,20 +59,23 @@ project-root/
 1. **Update Flask app (`backend.py`)**:
 
    ```python
-   app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://noteadmin:Jazzy.12345@<rds-endpoint>:5432/<dbname>'
+   app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dbadmin:hamab034@notes-app-db.cqpyuyqkewhs.us-east-1.rds.amazonaws.com:5432/notes_app_db'
    ```
 
 2. **Dockerfile**:
 
    ```dockerfile
-   FROM python:3.9-slim
+   FROM python:3.11-slim
 
    WORKDIR /app
 
-   COPY requirements.txt requirements.txt
-   RUN pip install -r requirements.txt
+   COPY requirements.txt .
+   RUN pip install --upgrade pip && \
+       pip install --no-cache-dir -r requirements.txt
 
    COPY . .
+
+   EXPOSE 5000
 
    CMD ["python", "backend.py"]
    ```
@@ -80,19 +83,27 @@ project-root/
 3. **Build and run on EC2**:
 
    ```bash
-   docker build -t noteapp-backend .
-   docker run -d -p 5000:5000 noteapp-backend
+   docker build -t notes-app-backend .
+   docker run -d -p 5000:5000 --name notes-backend-container notes-app-backend
    ```
 
-4. **Ensure port 5000 is open** in your EC2 security group
+4. **Verify the container is running**:
+
+   ```bash
+   docker ps
+   curl http://localhost:5000/
+   ```
+
+5. **Ensure port 5000 is open** in your EC2 security group
 
 ---
 
 ### 🗄️ Database (PostgreSQL on AWS RDS)
 
-- DB Name: `jahanzeb_abdullah_db`
-- Endpoint: `jahanzeb-abdullah-db.chkocg22cbbj.eu-north-1.rds.amazonaws.com`
-- Ensure EC2 security group is allowed on port `5432`
+- DB Name: `notes_app_db`
+- Endpoint: `notes-app-db.cqpyuyqkewhs.us-east-1.rds.amazonaws.com`
+- Username: `dbadmin`
+- Make sure EC2's security group is allowed to connect to the RDS security group on port 5432
 
 ---
 
@@ -140,7 +151,7 @@ project-root/
 6. **Update `api.js` in React**:
    ```js
    const API = axios.create({
-     baseURL: "http://<your-ec2-ip>:5000",
+     baseURL: "http://your-ec2-ip:5000",
    });
    ```
 
@@ -189,6 +200,6 @@ project-vpc/
 
 ## 👨‍💻 Author
 
-**Jahanzeb Khan, Abdullah Bin Masood**  
+**HAMZA UZAR & SHUJA ABBAS**  
 Secure, Dockerized, Full-Stack Deployment on AWS  
 © 2025

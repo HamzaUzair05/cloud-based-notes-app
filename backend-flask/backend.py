@@ -6,27 +6,25 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
+import secrets
 
 # Initialize Flask App
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Replace with your actual database details
-host = 'jahanzeb-abdullah-db.chkocg22cbbj.eu-north-1.rds.amazonaws.com'
+# Replace with YOUR AWS database details
+host = 'notes-app-db.cqpyuyqkewhs.us-east-1.rds.amazonaws.com'
 port = 5432
-user = 'iam_user'  # IAM user for DB
-region = 'eu-north-1'  # Your AWS region
+user = 'dbadmin'
+password = 'hamab034'
+dbname = 'notes_app_db'
 
-# Generate IAM Token
-rds_client = boto3.client('rds', region_name=region)
-token = rds_client.generate_db_auth_token(
-    DBHostname=host, Port=port, DBUsername=user
-)
-
-# Construct the database URI with IAM Token
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{user}:{token}@{host}:{port}/postgres?sslmode=require"
+# Simplified connection string
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'
+
+# Generate a strong random JWT secret key
+app.config['JWT_SECRET_KEY'] = secrets.token_hex(32)  # 32 bytes of randomness
 
 # Initialize database and JWT manager
 db = SQLAlchemy(app)

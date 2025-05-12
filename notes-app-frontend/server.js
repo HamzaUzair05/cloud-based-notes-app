@@ -4,17 +4,19 @@ const AWS = require("aws-sdk");
 
 const app = express();
 
-// Setup AWS SDK (credentials automatically loaded from IAM role in EB)
-const s3 = new AWS.S3();
+// Setup AWS SDK with your region
+const s3 = new AWS.S3({
+  region: 'us-east-1' // Using your actual region (us-east-1 based on your RDS)
+});
 
-// Your private S3 image info
-const BUCKET_NAME = "elasticbeanstalk-eu-north-1-149536481855";
-const IMAGE_KEY = "notes_image.jpg";
+// Your private S3 bucket info - you'll need to create this
+const BUCKET_NAME = "notes-app-images-bucket"; // Create this bucket in your AWS account
+const IMAGE_KEY = "notes_image.jpg"; // Upload this image to your bucket
 
 // Serve static files from the React build
 app.use(express.static(path.join(__dirname, "build")));
 
-// Secure route to fetch the private image from S3
+// Handle the case where S3 isn't set up yet
 app.get("/secure-image", async (req, res) => {
   try {
     const params = {
@@ -22,13 +24,15 @@ app.get("/secure-image", async (req, res) => {
       Key: IMAGE_KEY,
     };
 
+    // Try to get the object from S3
     const data = await s3.getObject(params).promise();
-
+    
     res.set("Content-Type", data.ContentType);
     res.send(data.Body);
   } catch (err) {
     console.error("S3 fetch error:", err);
-    res.status(500).send("Failed to load image");
+    // Return a placeholder image if S3 access fails
+    res.sendFile(path.join(__dirname, "public", "placeholder.jpg"));
   }
 });
 
