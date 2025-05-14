@@ -157,6 +157,17 @@ project-root/
 
 ---
 
+### 📸 Image Storage (AWS S3)
+
+- **Bucket**: `notes-app-images-bucket`
+- **Structure**:
+  - `/public/` - Images accessible to anyone
+  - `/private/` - Images only accessible via authenticated backend requests
+- **CORS**: Configured for browser uploads
+- **Policies**: Separate policies for public and private content
+
+---
+
 ## 🔐 Environment Notes
 
 | Component  | Configuration                             |
